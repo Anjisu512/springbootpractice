@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<!-- Thymeleaf 이용하기위해 네임스페이스 지정하기 -->
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout/basic.html}">
+<head>
+	<title> 게시글 상세보기 </title>
+</head>
+
+<div layout:fragment="content">
+	<div class="row mt-3">
+		<div class="col">
+			<div class="card">
+				<div class="card-header">
+					게시글 상세보기
+				</div> <!-- card header end -->
+				<div class="card-body">
+					<div class="input-group mb-3">
+						<span class="input-group-text">게시글번호</span>
+						<input type="text" class="form-control" th:value="${dto.bno}" readonly>
+					</div>
+					<div class="input-group mb-3">
+						<span class="input-group-text">제목</span>
+						<input type="text" class="form-control" th:value="${dto.title}" readonly>
+					</div>
+					<div class="input-group mb-3">
+						<span class="input-group-text">내용</span>
+						<textarea class="form-control col-sm-5" rows="5" readonly>[[${dto.content}]]</textarea>
+					</div>
+					<div class="input-group mb-3">
+						<span class="input-group-text">작성자</span>
+						<input type="text" class="form-control" th:value="${dto.writer}" readonly>
+					</div>
+					<div class="input-group mb-3">
+						<span class="input-group-text">게시일</span>
+						<input type="text" class="form-control" th:value="${#temporals.format(dto.regDate,
+						'yyyy-MM-dd HH:mm:ss')}" readonly>
+					</div>
+					<div class="input-group mb-3">
+						<span class="input-group-text">수정일자</span>
+						<input type="text" class="form-control" th:value="${#temporals.format(dto.modDate,
+						'yyyy-MM-dd HH:mm:ss')}" readonly>
+					</div>
+					<div class="my-4">
+						
+						<!-- 페이징 고정처리했던 메소드${link} -->
+						<div class="float-end" th:with="link = ${pageRequestDTO.getLink()}">
+							<a th:href="|@{/board/modify(bno=${dto.bno})}&${link}|" class="text-decoration-none">
+								<button type="button" class="btn btn-secondary" >수정</button>
+							</a>
+							<a th:href="|@{/board/list}?${link}|" class="text-decoration-none">
+								<button type="button" class="btn btn-primary" >목록</button>							
+							</a>
+						</div>
+					</div>
+					
+				</div><!-- card-body end -->
+			</div> <!-- card end -->
+		</div> <!-- col end -->
+	</div> <!-- row end -->
+	
+	<!-- reply start -->
+	<div class="row mt-3">
+		<div class="col-md-12">
+			<div class="my-4">
+				<button class="btn btn-info addReplyBtn">댓글 등록</button>				
+			</div>
+			<!-- 댓글 목록보여주는곳 start -->
+			<ul class="list-group replyList">
+			</ul>
+		</div>
+		<div class="row mt-3">
+			<div class="col">
+				<!-- 댓글 페이징처리부분 start -->
+				<ul class="pagination replyPaging">				
+				</ul>
+			</div>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script src="/js/reply.js"></script>
+</div><!-- end layout:content -->
+
+<script layout:fragment="script" th:inline="javascript">
+	//댓글 달기						
+		const bno = [[${dto.bno}]]
+		const replyList = document.querySelector('.replyList')//댓글목록dom
+		const replyPaging = document.querySelector('.replyPaging')//페이지 목록dom
+		
+		function printList(dtoList){//댓글 목록 출력
+			let str='';
+			if(dtoList && dtoList.length >0){
+				
+				for(const dto of dtoList){
+					str += `<li class="list-group-item d-flex replyItem">
+						<span class="col-2">${dto.rno}</span>
+						<span class="col-6" data-rno="${dto.rno}">${dto.replyText}</span>
+						<span class="col-2">${dto.replyer}</span>
+						<span class="col-2">${dto.regDate}</span>
+						</li>`
+				}	
+			}
+			replyList.innerHTML = str
+		} //댓글목록 출력 end
+		
+		function printPages(data){ //댓글 페이지 목록 출력
+			//pagination
+			let pageStr='';
+			
+			if(data.prev){
+				pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start-1}">이전</a></li>`
+			}
+			
+			for(let i = data.start; i<=data.end; i++){
+				pageStr +=`<li class="page-item ${i == data.page?"active":""} "><a
+										class="page-link" data-page="${i}">${i}</a></li>`
+			}
+			
+			if(data.next){
+				pagaStr += `<li class="page-item"><a class="page-link" data-page="${data.end +1}">다음</a></li>`
+			}
+			replyPaging.innerHTML = pageStr
+		}
+	
+		
+		//axios getList 호출
+		function printReplies(page, size, goLast){
+			getList({bno, page, size, goLast}).then(
+				data => {
+					printList(data.dtoList) //목록처리
+					printPages(data) // 페이징처리
+				}
+			).catch(e => {
+				console.error(e)
+			})
+		}
+		printReplies(1,10) //무조건 호출
+</script>

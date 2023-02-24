@@ -1,0 +1,77 @@
+
+buildscript {
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.6.4'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0'
+    implementation 'org.modelmapper:modelmapper:3.1.0' // DTO와 엔티티간 변환처리를 간단히 처리하기위한 라이브러리
+    
+    // 등록처리시 서버에서 검증한후 등록하는 방식을 위한 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-validation' 
+    
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    
+    compileOnly 'org.projectlombok:lombok'
+    
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor(
+
+            "javax.persistence:javax.persistence-api",
+
+            "javax.annotation:javax.annotation-api",
+
+            "com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
+
+	//part6 시작
+	implementation 'io.springfox:springfox-boot-starter:3.0.0' 
+	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+	//swagger ui를 이용한 rest방식의 댓글 처리 구현을 위해 디펜던시 설정
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+        }
+    }
+}

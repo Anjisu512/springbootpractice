@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+
+<!-- Thymeleaf 이용하기위해 네임스페이스 지정하기 -->
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>title</title>
+</head>
+<body>
+
+<h1 th:text="${msg}"></h1>
+
+<a th:href="@{ex/ex1}">ex1</a>
+
+
+<div th:with="num1 =${10}, num2 = ${20}">
+	<h4 th:text="${num1+num2}"></h4>
+</div>
+
+
+
+</body>
+</html>

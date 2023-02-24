@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<!-- Thymeleaf 이용하기위해 네임스페이스 지정하기 -->
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>title</title>
+</head>
+<body>
+
+	<div th:text="${list}"></div>
+	<div th:text="${map}"></div>
+	<div th:text="${dto}"></div>
+	
+	<script th:inline="javascript">
+	const list = '[[${list}]]';
+	const map =  '[[${map}]]';
+	const dto ='[[${dto}]]'; 
+	
+	console.log(list)
+	console.log(map)
+	console.log(dto)
+	
+	</script>
+
+
+
+</body>
+</html>
